@@ -83,7 +83,7 @@ for file in range (len(filenamelist)):   # Loop by files in list
     fname = filenamelist[file]
     handle = open(fname, 'r')
     
-    print ('\n\n Analyzing file:', filename[file], ' \n')
+    print ('\n Analyzing file:', filename[file])
     
     #   *** Reading datafile and filling the matices of values ***
     ADC_counts = []
@@ -115,15 +115,13 @@ del ADC_counts, ADC_values
 
 
 
-#print (array_ADC_counts.shape)
-#print (array_ADC_values.shape)
-
-
 
 
 print ('\n\n    Building figures... \n ')
 
 
+for i in range(len(filename)):
+    filename[i] = filename[i][5:-4].replace('_',' ')
 
 
 # *** Plotting the graphs ***
@@ -138,8 +136,9 @@ for i in range (len(filenamelist)):
     #plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
     plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
     plt.legend(loc = 'upper right', fontsize = 5)
+    plt.text(0.1,  0.02, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
     plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-    pylab.savefig('LVM_viewer_results/' + filename[i] + '.png', bbox_inches='tight', dpi = 200)
+    pylab.savefig(newpath + '/' + filename[i] + '.png', bbox_inches='tight', dpi = 200)
     #plt.show()
     plt.close('all')
 
@@ -159,113 +158,37 @@ plt.suptitle('Ground parameters measurements', fontsize = 12, fontweight = 'bold
 #plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
 plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
 plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
+plt.text(0.1,  0.02, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
 plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-pylab.savefig('LVM_viewer_results/01_' + filename[0] + '_' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
+pylab.savefig(newpath + '/01_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
 #plt.show()
 plt.close('all')
 
 
 
 points_to_plot = [1800, 3000, 7500, 10000, 13000, 16000]
-j = 0
+
+
+
 
 plt.figure()
-plt.plot(filename[:], array_ADC_values[points_to_plot[0], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[0]))
-plt.plot(filename[:], array_ADC_values[points_to_plot[1], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[1]))
-plt.plot(filename[:], array_ADC_values[points_to_plot[2], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[2]))
-plt.plot(filename[:], array_ADC_values[points_to_plot[3], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[3]))
-plt.plot(filename[:], array_ADC_values[points_to_plot[4], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[4]))
-plt.plot(filename[:], array_ADC_values[points_to_plot[5], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[5]))
-
+for i in range(len(points_to_plot) - 1):
+    plt.plot(filename[:], array_ADC_values[points_to_plot[i], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[i]))
 plt.ylim((-0.05, 1.5))
 plt.xlabel('Points in time')
 plt.ylabel('Amplitude ratio')
+plt.xticks(rotation = 60, fontsize = 5)
 plt.suptitle('Ground parameters measurements', fontsize = 12, fontweight = 'bold')
 #plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
 plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
-plt.legend(loc = 'upper right', fontsize = 5)
-plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-pylab.savefig('LVM_viewer_results/00_' +str(points_to_plot[j]) + '_' + filename[0] + '_' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
+plt.legend(loc = 'lower right', fontsize = 5)
+plt.text(0.1,  -0.07, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
+plt.text(0.73, -0.07,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
+pylab.savefig(newpath + '/00_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
 
 #plt.show()
 plt.close('all')
 
 
 
-'''
-
-
-
-
-
-# *** Plotting the graphs ***
-
-for i in range (2*setNo):
-    plt.figure()
-    for k in range(len(filenamelist)):
-        plt.plot(frequency, parameters[:, i, k], linewidth = '1.50', label = filename[k])
-    
-    plt.xlabel('Frequency, MHz')
-    plt.ylabel(param_names[i])
-    plt.suptitle(param_names[i], fontsize = 12, fontweight = 'bold')
-    plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
-    plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
-    #plt.legend(loc = 'lower right', fontsize = 5) # upper right
-    plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
-    plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-    pylab.savefig('SMPviewer Results/' + str(i) + '_' + param_names[i] + '.png', bbox_inches='tight', dpi = 200)
-    #plt.show()
-    plt.close('all')
-
-    
-    
-'''
-'''    
-plt.figure()
-
-for k in range(len(filenamelist)):
-    plt.plot(frequency, parameters[:, 3, k] - parameters[:, 2, k], linewidth = '1.50', label = filename[k])
-
-plt.xlabel('Frequency, MHz')
-plt.ylabel(param_names[i])
-plt.suptitle(param_names[i], fontsize=12, fontweight='bold')
-plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 10)
-plt.grid(b = True, which = 'both', color = '0.00',linestyle = '--')
-#plt.legend(loc = 'upper right', fontsize = 5)
-pylab.savefig('SMPviewer Results/S21_difference.png', bbox_inches='tight', dpi = 160)
-#pylab.savefig('SMPviewer Results/' + param_names[i] + '_' + fname + '_' + fileDate +'.png', bbox_inches='tight', dpi = 160)
-#plt.show()
-plt.close('all')
-'''
-'''    
-    
-if make_phase_linear == 1:
-    for i in range (2*setNo):
-        if param_names[i] == "S21 Phase" or param_names[i] == "S21 Фаза":
-            
-                
-    
-            plt.figure()
-            for k in range(len(filenamelist)):
-            
-                parameters_lin = parameters[:, i, k]
-                parameters_lin = phase_linearization(parameters_lin)
-                
-                plt.plot(frequency, parameters_lin, linewidth = '1.50', label = filename[k])
-                
-            plt.xlabel('Frequency, MHz')
-            plt.ylabel(param_names[i])
-            plt.suptitle(param_names[i], fontsize = 12, fontweight = 'bold')
-            plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
-            plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
-            #plt.legend(loc = 'lower left', fontsize = 5) # upper right
-            plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
-            plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-            pylab.savefig('SMPviewer Results/' + str(i) + '_' + param_names[i] + '_linear.png', bbox_inches='tight', dpi = 200)
-            #plt.show()
-            plt.close('all')
-    
-    
-    
-'''
 print ('\n\n    *** Program finished ***   \n\n\n')

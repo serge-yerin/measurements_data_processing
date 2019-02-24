@@ -44,7 +44,7 @@ print (' ')
 
 # *** Creating a folder where all pictures and results will be stored (if is doen't exist) ***
 
-newpath = "SMPviewer Results" 
+newpath = "SMP_viewer_results" 
 if not os.path.exists(newpath):
     os.makedirs(newpath)
     
@@ -156,7 +156,7 @@ for i in range (2*setNo):
     #plt.legend(loc = 'lower right', fontsize = 5) # upper right
     plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
     plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-    pylab.savefig('SMPviewer Results/' + str(i) + '_' + param_names[i] + '.png', bbox_inches='tight', dpi = 200)
+    pylab.savefig(newpath + '/' + str(i) + '_' + param_names[i] + '.png', bbox_inches='tight', dpi = 200)
     #plt.show()
     plt.close('all')
 
@@ -203,7 +203,7 @@ if make_phase_linear == 1:
             #plt.legend(loc = 'lower left', fontsize = 5) # upper right
             plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
             plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-            pylab.savefig('SMPviewer Results/' + str(i) + '_' + param_names[i] + '_linear.png', bbox_inches='tight', dpi = 200)
+            pylab.savefig(newpath + '/' + str(i) + '_' + param_names[i] + '_linear.png', bbox_inches='tight', dpi = 200)
             #plt.show()
             plt.close('all')
     
