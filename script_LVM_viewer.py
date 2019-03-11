@@ -90,7 +90,6 @@ for file in range (len(filenamelist)):   # Loop by files in list
     ADC_values = []
 
 
-
     no_of_counts = 0
         
     line_no = 0
@@ -114,6 +113,22 @@ array_ADC_values = np.reshape(array_ADC_values, [no_of_counts, len(filenamelist)
 del ADC_counts, ADC_values
 
 
+# *** Calculations of amplitude ratios ***
+amplitude_ratio = np.zeros((3, len(filename)))
+for i in range(len(filename)):
+    amplitude_ratio[0, i] = 20*np.log10(array_ADC_values[2949,i] / array_ADC_values[3049,i])
+    amplitude_ratio[1, i] = 20*np.log10(array_ADC_values[8949,i] / array_ADC_values[9049,i])
+    amplitude_ratio[2, i] = 20*np.log10(array_ADC_values[14949,i] / array_ADC_values[15049,i])
+
+
+
+
+# *** Saving amplitude ratio to TXT file ***
+
+TXTfile = open('LVM_viewer_results/Amplitude_ratio_'+ filename[0] + ' - ' + filename[len(filenamelist)-1] +'.txt', "w")
+for i in range(len(filename)):
+    TXTfile.write(filename[i].rstrip()+'   '+str(amplitude_ratio[0, i])+'   '+str(amplitude_ratio[1, i])+'   '+str(amplitude_ratio[2, i])+' \n' )
+TXTfile.close() 
 
 
 
@@ -127,15 +142,22 @@ for i in range(len(filename)):
 # *** Plotting the graphs ***
 
 for i in range (len(filenamelist)):
-    plt.figure()
+    fig, ax = plt.subplots()
     plt.plot(array_ADC_counts[:, i], array_ADC_values[:, i], linewidth = '1.50', label = filename[i])
-    plt.ylim((-0.05, 1.5))
+    plt.xlim((0, 19000))
+    plt.ylim((-0.05, 1.3))
+    ax.set_yticks([0, 0.1, 0.2, 0.3, 0.40, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3], minor=False)
+    ax.set_yticks([0, 0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.05, 1.15, 1.25], minor=True)
+    ax.set_xticks([3000, 6000, 9000, 12000, 15000, 18000], minor=False)
+    ax.set_xticks([1500, 4500, 7500, 10500, 13500, 16500], minor=True)
+    plt.text(1850, - 0.045, '20 MHz', fontsize=10, fontweight = 'bold', color = 'r')
+    plt.text(7850, - 0.045, '30 MHz', fontsize=10, fontweight = 'bold', color = 'g')
+    plt.text(13850, - 0.045, '60 MHz', fontsize=10, fontweight = 'bold', color = 'b')   
     plt.xlabel('Points in time')
-    plt.ylabel('Amplitude ratio')
+    plt.ylabel('Amplitude, V')
     plt.suptitle('Ground parameters measurements', fontsize = 12, fontweight = 'bold')
-    #plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
     plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
-    plt.legend(loc = 'upper right', fontsize = 5)
+    plt.legend(loc = 'upper right', fontsize = 6)
     plt.text(0.1,  0.02, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
     plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
     pylab.savefig(newpath + '/' + filename[i] + '.png', bbox_inches='tight', dpi = 200)
@@ -147,16 +169,25 @@ for i in range (len(filenamelist)):
 
 
 
-plt.figure()
+fig, ax = plt.subplots()
 for i in range(len(filenamelist)):
     plt.plot(array_ADC_counts[:, i], array_ADC_values[:, i], linewidth = '1.50', label = filename[i])
 
 plt.ylim((-0.05, 1.5))
 plt.xlabel('Points in time')
-plt.ylabel('Amplitude ratio')
+plt.ylabel('Amplitude, V')
 plt.suptitle('Ground parameters measurements', fontsize = 12, fontweight = 'bold')
 #plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
 plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
+plt.xlim((0, 19000))
+plt.ylim((-0.05, 1.3))
+ax.set_yticks([0, 0.1, 0.2, 0.3, 0.40, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3], minor=False)
+ax.set_yticks([0, 0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95, 1.05, 1.15, 1.25], minor=True)
+ax.set_xticks([3000, 6000, 9000, 12000, 15000, 18000], minor=False)
+ax.set_xticks([1500, 4500, 7500, 10500, 13500, 16500], minor=True)
+plt.text(1850, - 0.045, '20 MHz', fontsize=10, fontweight = 'bold', color = 'r')
+plt.text(7850, - 0.045, '30 MHz', fontsize=10, fontweight = 'bold', color = 'g')
+plt.text(13850, - 0.045, '60 MHz', fontsize=10, fontweight = 'bold', color = 'b')
 plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
 plt.text(0.1,  0.02, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
 plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
@@ -166,25 +197,30 @@ plt.close('all')
 
 
 
-points_to_plot = [1800, 3000, 7500, 10000, 13000, 16000]
+frequencies = [20, 30, 60]
+colors = ['r', 'g', 'b']
 
 
 
 
-plt.figure()
-for i in range(len(points_to_plot) - 1):
-    plt.plot(filename[:], array_ADC_values[points_to_plot[i], :], linewidth = '1.50', label = 'Point = ' + str(points_to_plot[i]))
-plt.ylim((-0.05, 1.5))
-plt.xlabel('Points in time')
-plt.ylabel('Amplitude ratio')
+
+fig, ax = plt.subplots(figsize=(8.0, 4.5))
+for i in range(3):
+    plt.plot(filename[:], amplitude_ratio[i, :], linewidth = '1.50', label = str(frequencies[i]) + ' MHz', color = colors[i])
+plt.ylim((-15.0, 15.0))
+plt.xlabel('Measurement sessions')
+plt.ylabel('Amplitude ratio, dB')
 plt.xticks(rotation = 60, fontsize = 5)
+ax.set_yticks([-15, -10, -5, 0, 5, 10, 15], minor=False)
+ax.set_yticks([-14, -13, -12, -11, -9, -8, -7, -6, -4, -3, -2, -1, 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14], minor=True)
+
 plt.suptitle('Ground parameters measurements', fontsize = 12, fontweight = 'bold')
 #plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
 plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
-plt.legend(loc = 'lower right', fontsize = 5)
+plt.legend(loc = 'lower right', fontsize = 8)
 plt.text(0.1,  -0.07, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
 plt.text(0.73, -0.07,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-pylab.savefig(newpath + '/00_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
+pylab.savefig(newpath + '/00_Amp_ratio_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
 
 #plt.show()
 plt.close('all')
