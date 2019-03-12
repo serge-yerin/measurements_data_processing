@@ -2,16 +2,6 @@
 # Program intended to analyze data from measurements with OBZOR-103
 
 #*************************************************************
-#                        PARAMETERS                          *
-#*************************************************************
-
-FilesOrFolder = 1      # To analyze particular files (0) or all files in folder (1)
-directory = 'DATA/'
-make_phase_linear = 1  # For phase data make linearization instead of jumps from -180 to 180
-filename = []
-
-
-#*************************************************************
 #                   IMPORT LIBRARIES                         *
 #*************************************************************
 
@@ -22,12 +12,6 @@ import time
 import os
 
 from f_text_manipulations import find_between, float_convert
-from f_phase_data_linearization import phase_linearization
-
-
-#*************************************************************
-#                       FUNCTIONS                            *
-#*************************************************************
 
 
 #*************************************************************
@@ -52,9 +36,9 @@ if not os.path.exists(newpath):
     os.makedirs(newpath)
     
 
-
-    
+   
 # *** Search LVM files in the directory ***
+directory = 'DATA/'
 filename = []
 filenamelist=[]
 i = 0
@@ -120,23 +104,29 @@ for i in range(len(filename)):
     amplitude_ratio[1, i] = 20*np.log10(array_ADC_values[8949,i] / array_ADC_values[9049,i])
     amplitude_ratio[2, i] = 20*np.log10(array_ADC_values[14949,i] / array_ADC_values[15049,i])
 
-
+# Shortening file names
+for i in range(len(filename)):
+    filename[i] = filename[i][5:-4]
 
 
 # *** Saving amplitude ratio to TXT file ***
-
 TXTfile = open('LVM_viewer_results/Amplitude_ratio_'+ filename[0] + ' - ' + filename[len(filenamelist)-1] +'.txt', "w")
 for i in range(len(filename)):
-    TXTfile.write(filename[i].rstrip()+'   '+str(amplitude_ratio[0, i])+'   '+str(amplitude_ratio[1, i])+'   '+str(amplitude_ratio[2, i])+' \n' )
+    TXTfile.write(filename[i].rstrip() + '   ' + '   '.join(format(amplitude_ratio[j, i], "20.16f") for j in range(3)) + ' \n')
 TXTfile.close() 
+
 
 
 
 print ('\n\n    Building figures... \n ')
 
 
+
+
+# Deleting underscores in file names
 for i in range(len(filename)):
-    filename[i] = filename[i][5:-4].replace('_',' ')
+    filename[i] = filename[i].replace('_',' ')
+
 
 
 # *** Plotting the graphs ***
@@ -177,7 +167,6 @@ plt.ylim((-0.05, 1.5))
 plt.xlabel('Points in time')
 plt.ylabel('Amplitude, V')
 plt.suptitle('Ground parameters measurements', fontsize = 12, fontweight = 'bold')
-#plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
 plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
 plt.xlim((0, 19000))
 plt.ylim((-0.05, 1.3))
@@ -191,7 +180,7 @@ plt.text(13850, - 0.045, '60 MHz', fontsize=10, fontweight = 'bold', color = 'b'
 plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
 plt.text(0.1,  0.02, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
 plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-pylab.savefig(newpath + '/01_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
+pylab.savefig(newpath + '/01_All_measurements_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
 #plt.show()
 plt.close('all')
 
@@ -200,9 +189,9 @@ plt.close('all')
 frequencies = [20, 30, 60]
 colors = ['r', 'g', 'b']
 
-
-
-
+# Shortening file names once more
+for i in range(len(filename)):
+    filename[i] = filename[i][0:-4]
 
 fig, ax = plt.subplots(figsize=(8.0, 4.5))
 for i in range(3):
@@ -210,18 +199,15 @@ for i in range(3):
 plt.ylim((-15.0, 15.0))
 plt.xlabel('Measurement sessions')
 plt.ylabel('Amplitude ratio, dB')
-plt.xticks(rotation = 60, fontsize = 5)
+plt.xticks(rotation = 60, fontsize = 6)
 ax.set_yticks([-15, -10, -5, 0, 5, 10, 15], minor=False)
 ax.set_yticks([-14, -13, -12, -11, -9, -8, -7, -6, -4, -3, -2, -1, 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14], minor=True)
-
 plt.suptitle('Ground parameters measurements', fontsize = 12, fontweight = 'bold')
-#plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
 plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
 plt.legend(loc = 'lower right', fontsize = 8)
 plt.text(0.1,  -0.07, 'yerin.serge@gmail.com, IRA NASU', fontsize=5, transform=plt.gcf().transFigure)
 plt.text(0.73, -0.07,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-pylab.savefig(newpath + '/00_Amp_ratio_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
-
+pylab.savefig(newpath + '/00_Amplitude_ratio_' + filename[0] + ' - ' + filename[len(filenamelist)-1] +'.png', bbox_inches='tight', dpi = 200)
 #plt.show()
 plt.close('all')
 
