@@ -107,11 +107,13 @@ for i in range(len(labels)):
     plt.figure()
     for file in range(files_no):
         plt.plot(frequency_matrix[file], full_data[file * len(labels) + i][:], linewidth='1.50', label=file_name_list[file])
+    if labels[i] == 'S11 VSWR':
+        plt.ylim(1, 3)
     plt.xlabel('Frequency, MHz')
     plt.ylabel(labels[i])
-    plt.suptitle('Measurement results', fontsize=12, fontweight='bold')
+    #plt.suptitle('Measurement results', fontsize=12, fontweight='bold')
     plt.grid(b=True, which='both', color='0.65', linestyle='--')
-    plt.legend(loc='center left', fontsize=5, bbox_to_anchor=(1, 0.5))
+    plt.legend(loc='upper right', fontsize=5) # , bbox_to_anchor=(1, 0.5)
     plt.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
     pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(i)) + '_' + labels[i] + '.png', bbox_inches='tight', dpi=200)
     plt.close('all')
