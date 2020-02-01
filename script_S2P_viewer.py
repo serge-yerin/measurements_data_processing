@@ -41,7 +41,8 @@ file_name_list = find_files_only_in_current_folder(directory, '.s2p', 1)
 
 files_no = len(file_name_list)
 frequency_matrix = []
-labels = ['S11 Amplitude', 'S11 Phase, deg', 'S11 Phase linear, deg', 'S11 VSWR', 'S21 Amplitude', 'S21 Phase, deg', 'S21 Phase linear, deg']
+labels = ['S11 Amplitude', 'S11 Power', 'S11, dB', 'S11 Phase, deg', 'S11 Phase linear, deg', 'S11 VSWR',
+          'S21 Amplitude', 'S21 Power', 'S21, dB', 'S21 Phase, deg', 'S21 Phase linear, deg']  #  'R + jX'
 
 for file in range(files_no):
     fname = directory + file_name_list[file]
@@ -78,20 +79,25 @@ for file in range(files_no):
         # Making complex S-parameters matrices
         S_11 = np.zeros((data_length), dtype=complex)
         S_21 = np.zeros((data_length), dtype=complex)
-        full_data = np.zeros((len(labels) * len(labels), data_length))
+        full_data = np.zeros((len(labels) * files_no, data_length))
 
     frequency_matrix.append(frequency)
     S_11[:] = data[0][:] + 1j * data[1][:]
     S_21[:] = data[2][:] + 1j * data[3][:]
 
     full_data[file * len(labels) + 0][:] = np.abs(S_11)[:]
-    full_data[file * len(labels) + 1][:] = np.angle(S_11, deg=True)[:]
-    full_data[file * len(labels) + 2][:] = phase_linearization(np.angle(S_11, deg=True)[:])
-    full_data[file * len(labels) + 3][:] = (1 + np.abs(S_11)[:]) / (1 - np.abs(S_11)[:])
-    full_data[file * len(labels) + 4][:] = np.abs(S_21)[:]
-    full_data[file * len(labels) + 5][:] = np.angle(S_21, deg=True)[:]
-    full_data[file * len(labels) + 6][:] = phase_linearization(np.angle(S_21, deg=True)[:])
+    full_data[file * len(labels) + 1][:] = np.power(np.abs(S_11), 2)[:]
+    full_data[file * len(labels) + 2][:] = 10 * np.log10(np.power(np.abs(S_11), 2))[:]
+    full_data[file * len(labels) + 3][:] = np.angle(S_11, deg=True)[:]
+    full_data[file * len(labels) + 4][:] = phase_linearization(np.angle(S_11, deg=True)[:])
+    full_data[file * len(labels) + 5][:] = (1 + np.abs(S_11)[:]) / (1 - np.abs(S_11)[:])
+    full_data[file * len(labels) + 6][:] = np.abs(S_21)[:]
+    full_data[file * len(labels) + 7][:] = np.power(np.abs(S_21), 2)[:]
+    full_data[file * len(labels) + 8][:] = 10 * np.log10(np.power(np.abs(S_21), 2))[:]
+    full_data[file * len(labels) + 9][:] = np.angle(S_21, deg=True)[:]
+    full_data[file * len(labels) + 10][:] = phase_linearization(np.angle(S_21, deg=True)[:])
 
+#full_data[file * len(labels) + 6][:] = ((1 + S_11) / (1 - S_11))[:]
 del data, float_list, S_11, S_21
 
 print('\n\n    Making figures... \n ')
@@ -107,7 +113,7 @@ for i in range(len(labels)):
     # plt.legend(loc = 'lower right', fontsize = 5) # upper right
     plt.legend(loc='center left', fontsize=5, bbox_to_anchor=(1, 0.5))
     plt.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
-    pylab.savefig(newpath + '/' + labels[i] + '.png', bbox_inches='tight', dpi=200)
+    pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(i)) + '_' + labels[i] + '.png', bbox_inches='tight', dpi=200)
     plt.close('all')
 
 print('\n\n    *** Program finished ***   \n\n\n')
