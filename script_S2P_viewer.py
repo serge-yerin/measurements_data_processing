@@ -80,6 +80,7 @@ for file in range(files_no):
         S_11 = np.zeros((data_length), dtype=complex)
         S_21 = np.zeros((data_length), dtype=complex)
         full_data = np.zeros((len(labels) * files_no, data_length))
+        impedance = np.zeros((files_no, data_length), dtype=complex)
 
     frequency_matrix.append(frequency)
     S_11[:] = data[0][:] + 1j * data[1][:]
@@ -96,11 +97,12 @@ for file in range(files_no):
     full_data[file * len(labels) + 8][:] = 10 * np.log10(np.power(np.abs(S_21), 2))[:]
     full_data[file * len(labels) + 9][:] = np.angle(S_21, deg=True)[:]
     full_data[file * len(labels) + 10][:] = phase_linearization(np.angle(S_21, deg=True)[:])
+    impedance[file][:] = ((1 + S_11[:]) / (1 - S_11[:]))
 
-#full_data[file * len(labels) + 6][:] = ((1 + S_11) / (1 - S_11))[:]
 del data, float_list, S_11, S_21
 
 print('\n\n    Making figures... \n ')
+
 for i in range(len(labels)):
     plt.figure()
     for file in range(files_no):
@@ -108,12 +110,42 @@ for i in range(len(labels)):
     plt.xlabel('Frequency, MHz')
     plt.ylabel(labels[i])
     plt.suptitle('Measurement results', fontsize=12, fontweight='bold')
-    # plt.title('Measured: ' + fileDate + ' at ' + fileTime, fontsize=8)
     plt.grid(b=True, which='both', color='0.65', linestyle='--')
-    # plt.legend(loc = 'lower right', fontsize = 5) # upper right
     plt.legend(loc='center left', fontsize=5, bbox_to_anchor=(1, 0.5))
     plt.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
     pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(i)) + '_' + labels[i] + '.png', bbox_inches='tight', dpi=200)
     plt.close('all')
+
+# Plot of input impedance
+fig, ax1 = plt.subplots()
+for file in range(files_no):
+    ax1.plot(frequency_matrix[file], np.real(impedance[file])[:] * 50, linewidth='1.50', label=file_name_list[file])
+ax1.set_xlabel('Frequency, MHz')
+ax1.set_ylabel('R input')
+fig.suptitle('Measurement results', fontsize=12, fontweight='bold')
+ax1.grid(b=True, which='both', color='0.65', linestyle='--')
+ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+for file in range(files_no):
+    ax2.plot(frequency_matrix[file], np.imag(impedance[file])[:] * 50, linewidth='1.50', linestyle='--', label=file_name_list[file])
+ax2.set_ylabel('X input')
+fig.legend(loc='center left', fontsize=5, bbox_to_anchor=(1, 0.5))
+fig.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
+pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(len(labels))) + '_Input impedance.png', bbox_inches='tight', dpi=200)
+plt.close('all')
+
+
+# Plot of input impedance module
+fig, ax1 = plt.subplots()
+for file in range(files_no):
+    ax1.plot(frequency_matrix[file], np.abs(impedance[file])[:] * 50, linewidth='1.50', label=file_name_list[file])
+ax1.set_xlabel('Frequency, MHz')
+ax1.set_ylabel('|Z| input')
+fig.suptitle('Measurement results', fontsize=12, fontweight='bold')
+ax1.grid(b=True, which='both', color='0.65', linestyle='--')
+fig.legend(loc='center left', fontsize=5, bbox_to_anchor=(0.9, 0.5))
+fig.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
+pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(len(labels)+1)) + '_Input impedance module.png', bbox_inches='tight', dpi=200)
+plt.close('all')
+
 
 print('\n\n    *** Program finished ***   \n\n\n')
