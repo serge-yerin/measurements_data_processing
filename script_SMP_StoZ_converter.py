@@ -55,7 +55,7 @@ if FilesOrFolder == 1:
     
     # *** Search SMP files in the directory ***
     filename = []
-    filenamelist=[]
+    file_name_list=[]
     i = 0
     print ('  Directory: ', directory, '\n')
     print ('  List of files to be analyzed: ')
@@ -65,18 +65,18 @@ if FilesOrFolder == 1:
                 i = i + 1
                 print ('         ', i, ') ', file)
                 filename.append(str(file))
-                filenamelist.append(str(os.path.join(root, file)))
+                file_name_list.append(str(os.path.join(root, file)))
 else:
-    filenamelist = directory + filename
+    file_name_list = directory + filename
 
 
 # *** Reading data from files ***
 
 parameters = []
-for file in range (len(filenamelist)):   # Loop by files in list
+for file in range (len(file_name_list)):   # Loop by files in list
 
     # *** Opening datafile ***
-    fname = filenamelist[file]
+    fname = file_name_list[file]
     handle = open(fname, 'r')
     
     print ('\n\n Analyzing file:', filename[file], ' \n')
@@ -124,7 +124,7 @@ for file in range (len(filenamelist)):   # Loop by files in list
     param_names = np.append(param_names, param_names_01, axis=0)
     param_names = np.append(param_names, param_names_02, axis=0)
 
-parameters = np.reshape(parameters, [Num_of_steps, 2*setNo, len(filenamelist)], order='F')
+parameters = np.reshape(parameters, [Num_of_steps, 2*setNo, len(file_name_list)], order='F')
     
 del param_names_01, param_names_02, list_01, list_02
 
@@ -142,121 +142,113 @@ print ('\n\n    Building figures... \n ')
 
 
 # *** Plotting the graphs ***
-#
-# for i in range (2*setNo):
-#     plt.figure()
-#     for k in range(len(filenamelist)):
-#         plt.plot(frequency, parameters[:, i, k], linewidth = '1.50', label = filename[k])
-#
-#     plt.xlabel('Frequency, MHz')
-#     plt.ylabel(param_names[i])
-#     plt.suptitle(param_names[i], fontsize = 12, fontweight = 'bold')
-#     plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
-#     plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
-#     #plt.legend(loc = 'lower right', fontsize = 5) # upper right
-#     plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
-#     plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-#     pylab.savefig(newpath + '/' + str(i) + '_' + param_names[i] + '.png', bbox_inches='tight', dpi = 200)
-#     #plt.show()
-#     plt.close('all')
-#
-#
-    
-'''    
-plt.figure()
 
-for k in range(len(filenamelist)):
-    plt.plot(frequency, parameters[:, 3, k] - parameters[:, 2, k], linewidth = '1.50', label = filename[k])
+if len(param_names) > 2:
 
-plt.xlabel('Frequency, MHz')
-plt.ylabel(param_names[i])
-plt.suptitle(param_names[i], fontsize=12, fontweight='bold')
-plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 10)
-plt.grid(b = True, which = 'both', color = '0.00',linestyle = '--')
-#plt.legend(loc = 'upper right', fontsize = 5)
-pylab.savefig('SMPviewer Results/S21_difference.png', bbox_inches='tight', dpi = 160)
-#pylab.savefig('SMPviewer Results/' + param_names[i] + '_' + fname + '_' + fileDate +'.png', bbox_inches='tight', dpi = 160)
-#plt.show()
-plt.close('all')
-'''
-    
-    
-# if make_phase_linear == 1:
-#     for i in range (2*setNo):
-#         if param_names[i] == "S21 Phase" or param_names[i] == "S21 Фаза":
-#
-#
-#
-#             plt.figure()
-#             for k in range(len(filenamelist)):
-#
-#                 parameters_lin = parameters[:, i, k]
-#                 parameters_lin = phase_linearization(parameters_lin)
-#
-#                 plt.plot(frequency, parameters_lin, linewidth = '1.50', label = filename[k])
-#
-#             plt.xlabel('Frequency, MHz')
-#             plt.ylabel(param_names[i])
-#             plt.suptitle(param_names[i], fontsize = 12, fontweight = 'bold')
-#             plt.title( 'Measured: ' + fileDate + ' at ' + fileTime, fontsize = 8)
-#             plt.grid(b = True, which = 'both', color = '0.65', linestyle = '--')
-#             #plt.legend(loc = 'lower left', fontsize = 5) # upper right
-#             plt.legend(loc='center left', fontsize = 5, bbox_to_anchor=(1, 0.5))
-#             plt.text(0.73, 0.02,'Processed '+currentDate+ ' at '+currentTime, fontsize = 5, transform = plt.gcf().transFigure)
-#             pylab.savefig(newpath + '/' + str(i) + '_' + param_names[i] + '_linear.png', bbox_inches='tight', dpi = 200)
-#             #plt.show()
-#             plt.close('all')
-    
+    if param_names[0] == 'S11 Real' and param_names[2] == 'S11 Imag' and param_names[1] == 'S21 Real' and param_names[3] == 'S21 Imag':
 
-if param_names[0] == 'S11 Real' and param_names[2] == 'S11 Imag' and param_names[1] == 'S21 Real' and param_names[3] == 'S21 Imag':
+        files_no = len(file_name_list)
+        frequency_matrix = []
+        labels = ['S11 Amplitude', 'S11 Power', 'S11, dB', 'S11 Phase, deg', 'S11 Phase linear, deg', 'S11 VSWR',
+                  'S21 Amplitude', 'S21 Power', 'S21, dB', 'S21 Phase, deg', 'S21 Phase linear, deg']  # 'R + jX'
 
-    files_no = 1 #len(file_name_list)
-    frequency_matrix = []
-    labels = ['S11 Amplitude', 'S11 Power', 'S11, dB', 'S11 Phase, deg', 'S11 Phase linear, deg', 'S11 VSWR',
-              'S21 Amplitude', 'S21 Power', 'S21, dB', 'S21 Phase, deg', 'S21 Phase linear, deg']  # 'R + jX'
+        data_length = len(frequency)
 
-    data_length = len(frequency)
+        S_11 = np.zeros((data_length), dtype=complex)
+        S_21 = np.zeros((data_length), dtype=complex)
+        full_data = np.zeros((len(labels) * files_no, data_length))
+        impedance = np.zeros((files_no, data_length), dtype=complex)
 
-    S_11 = np.zeros((data_length), dtype=complex)
-    S_21 = np.zeros((data_length), dtype=complex)
-    full_data = np.zeros((len(labels) * files_no, data_length))
-    impedance = np.zeros((files_no, data_length), dtype=complex)
-
-
-    S_11[:] = parameters[:, 0, 0] + 1j * parameters[:, 2, 0]
-    S_21[:] = parameters[:, 1, 0] + 1j * parameters[:, 3, 0]
-
-    file = 0
-
-    full_data[file * len(labels) + 0][:] = np.abs(S_11)[:]
-    full_data[file * len(labels) + 1][:] = np.power(np.abs(S_11), 2)[:]
-    full_data[file * len(labels) + 2][:] = 10 * np.log10(np.power(np.abs(S_11), 2))[:]
-    full_data[file * len(labels) + 3][:] = np.angle(S_11, deg=True)[:]
-    full_data[file * len(labels) + 4][:] = phase_linearization(np.angle(S_11, deg=True)[:])
-    full_data[file * len(labels) + 5][:] = (1 + np.abs(S_11)[:]) / (1 - np.abs(S_11)[:])
-    full_data[file * len(labels) + 6][:] = np.abs(S_21)[:]
-    full_data[file * len(labels) + 7][:] = np.power(np.abs(S_21), 2)[:]
-    full_data[file * len(labels) + 8][:] = 10 * np.log10(np.power(np.abs(S_21), 2))[:]
-    full_data[file * len(labels) + 9][:] = np.angle(S_21, deg=True)[:]
-    full_data[file * len(labels) + 10][:] = phase_linearization(np.angle(S_21, deg=True)[:])
-    impedance[file][:] = ((1 + S_11[:]) / (1 - S_11[:]))
-
-    for i in range(len(labels)):
-        plt.figure()
         for file in range(files_no):
-            plt.plot(frequency, full_data[file * len(labels) + i][:], linewidth='1.50', label=filenamelist[file])
-        if labels[i] == 'S11 VSWR':
-            plt.ylim(1, 3)
-        plt.xlabel('Frequency, MHz')
-        plt.ylabel(labels[i])
-        # plt.suptitle('Measurement results', fontsize=12, fontweight='bold')
-        plt.grid(b=True, which='both', color='0.65', linestyle='--')
-        plt.legend(loc='upper right', fontsize=5)  # , bbox_to_anchor=(1, 0.5)
-        plt.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
-        pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(i)) + '_' + labels[i] + '.png', bbox_inches='tight',
-                      dpi=200)
-        plt.close('all')
 
+            S_11[:] = parameters[:, 0, file] + 1j * parameters[:, 2, file]
+            S_21[:] = parameters[:, 1, file] + 1j * parameters[:, 3, file]
+
+            full_data[file * len(labels) + 0][:] = np.abs(S_11)[:]
+            full_data[file * len(labels) + 1][:] = np.power(np.abs(S_11), 2)[:]
+            full_data[file * len(labels) + 2][:] = 10 * np.log10(np.power(np.abs(S_11), 2))[:]
+            full_data[file * len(labels) + 3][:] = np.angle(S_11, deg=True)[:]
+            full_data[file * len(labels) + 4][:] = phase_linearization(np.angle(S_11, deg=True)[:])
+            full_data[file * len(labels) + 5][:] = (1 + np.abs(S_11)[:]) / (1 - np.abs(S_11)[:])
+            full_data[file * len(labels) + 6][:] = np.abs(S_21)[:]
+            full_data[file * len(labels) + 7][:] = np.power(np.abs(S_21), 2)[:]
+            full_data[file * len(labels) + 8][:] = 10 * np.log10(np.power(np.abs(S_21), 2))[:]
+            full_data[file * len(labels) + 9][:] = np.angle(S_21, deg=True)[:]
+            full_data[file * len(labels) + 10][:] = phase_linearization(np.angle(S_21, deg=True)[:])
+            impedance[file][:] = ((1 + S_11[:]) / (1 - S_11[:]))
+
+if len(param_names) == 2:
+    if param_names[0] == 'S11 Real' and param_names[1] == 'S11 Imag':
+
+        files_no = len(file_name_list)
+        frequency_matrix = []
+        labels = ['S11 Amplitude', 'S11 Power', 'S11, dB', 'S11 Phase, deg', 'S11 Phase linear, deg', 'S11 VSWR']
+
+        data_length = len(frequency)
+
+        S_11 = np.zeros((data_length), dtype=complex)
+        #S_21 = np.zeros((data_length), dtype=complex)
+        full_data = np.zeros((len(labels) * files_no, data_length))
+        impedance = np.zeros((files_no, data_length), dtype=complex)
+
+        for file in range(files_no):
+            S_11[:] = parameters[:, 0, file] + 1j * parameters[:, 1, file]
+            #S_21[:] = parameters[:, 1, file] + 1j * parameters[:, 3, file]
+
+            full_data[file * len(labels) + 0][:] = np.abs(S_11)[:]
+            full_data[file * len(labels) + 1][:] = np.power(np.abs(S_11), 2)[:]
+            full_data[file * len(labels) + 2][:] = 10 * np.log10(np.power(np.abs(S_11), 2))[:]
+            full_data[file * len(labels) + 3][:] = np.angle(S_11, deg=True)[:]
+            full_data[file * len(labels) + 4][:] = phase_linearization(np.angle(S_11, deg=True)[:])
+            full_data[file * len(labels) + 5][:] = (1 + np.abs(S_11)[:]) / (1 - np.abs(S_11)[:])
+            impedance[file][:] = ((1 + S_11[:]) / (1 - S_11[:]))
+
+for i in range(len(labels)):
+    plt.figure()
+    for file in range(files_no):
+        plt.plot(frequency, full_data[file * len(labels) + i][:], linewidth='1.50', label=file_name_list[file])
+    if labels[i] == 'S11 VSWR':
+        plt.ylim(1, 3)
+    plt.xlabel('Frequency, MHz')
+    plt.ylabel(labels[i])
+    # plt.suptitle('Measurement results', fontsize=12, fontweight='bold')
+    plt.grid(b=True, which='both', color='0.65', linestyle='--')
+    plt.legend(loc='upper right', fontsize=5)  # , bbox_to_anchor=(1, 0.5)
+    plt.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
+    pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(i)) + '_' + labels[i] + '.png', bbox_inches='tight',
+                  dpi=200)
+    plt.close('all')
+
+# Plot of input impedance
+fig, ax1 = plt.subplots()
+for file in range(files_no):
+    ax1.plot(frequency, np.real(impedance[file])[:] * 50, linewidth='1.50', label='R '+file_name_list[file])
+ax1.set_xlabel('Frequency, MHz')
+ax1.set_ylabel('R input')
+fig.suptitle('Measurement results', fontsize=12, fontweight='bold')
+ax1.grid(b=True, which='both', color='0.65', linestyle='--')
+ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+for file in range(files_no):
+    ax2.plot(frequency, np.imag(impedance[file])[:] * 50, linewidth='1.50', linestyle='--', label='X '+file_name_list[file])
+ax2.set_ylabel('X input')
+fig.legend(loc='center left', fontsize=5, bbox_to_anchor=(1.05, 0.5))
+fig.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
+pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(len(labels))) + '_Input impedance.png', bbox_inches='tight', dpi=200)
+plt.close('all')
+
+
+# Plot of input impedance module
+fig, ax1 = plt.subplots()
+for file in range(files_no):
+    ax1.plot(frequency, np.abs(impedance[file])[:] * 50, linewidth='1.50', label=file_name_list[file])
+ax1.set_xlabel('Frequency, MHz')
+ax1.set_ylabel('|Z| input')
+fig.suptitle('Measurement results', fontsize=12, fontweight='bold')
+ax1.grid(b=True, which='both', color='0.65', linestyle='--')
+fig.legend(loc='center left', fontsize=5, bbox_to_anchor=(0.9, 0.5))
+fig.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
+pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(len(labels)+1)) + '_Input impedance module.png', bbox_inches='tight', dpi=200)
+plt.close('all')
 
 
 print ('\n\n    *** Program finished ***   \n\n\n')
