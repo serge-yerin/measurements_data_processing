@@ -237,6 +237,39 @@ pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(len(labels))) + '_Input 
 plt.close('all')
 
 
+# Plot of input resistance
+fig, ax1 = plt.subplots()
+for file in range(files_no):
+    ax1.plot(frequency, np.real(impedance[file])[:] * 50, linewidth='1.50', label='R '+file_name_list[file])
+ax1.set_yscale('log')
+ax1.set_ylim(0.1, 1000)
+ax1.set_xlabel('Frequency, MHz')
+ax1.set_ylabel('R input')
+fig.suptitle('Measurement results', fontsize=12, fontweight='bold')
+ax1.grid(b=True, which='both', color='0.65', linestyle='--')
+fig.legend(loc='center left', fontsize=5, bbox_to_anchor=(1.05, 0.5))
+fig.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
+pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(len(labels))) + '_Input resistance.png', bbox_inches='tight', dpi=200)
+plt.close('all')
+
+# Plot of input reactance
+fig, ax1 = plt.subplots()
+for file in range(files_no):
+    ax1.plot(frequency, np.imag(impedance[file])[:] * 50, linewidth='1.50', label='R '+file_name_list[file])
+#ax1.set_yscale('log')
+ax1.set_ylim(-2500, 500)
+ax1.set_xlabel('Frequency, MHz')
+ax1.set_ylabel('X input')
+fig.suptitle('Measurement results', fontsize=12, fontweight='bold')
+ax1.grid(b=True, which='both', color='0.65', linestyle='--')
+fig.legend(loc='center left', fontsize=5, bbox_to_anchor=(1.05, 0.5))
+fig.text(0.73, 0.02, 'Processed ' + currentDate + ' at ' + currentTime, fontsize=5, transform=plt.gcf().transFigure)
+pylab.savefig(newpath + '/' + ''.join("{:02.0f}".format(len(labels))) + '_Input reactance.png', bbox_inches='tight', dpi=200)
+plt.close('all')
+
+
+
+
 # Plot of input impedance module
 fig, ax1 = plt.subplots()
 for file in range(files_no):
